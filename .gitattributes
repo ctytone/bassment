@@ -1,0 +1,4 @@
+*.js linguist-generated=false
+sounds/*.js -diff
+*.wav binary
+*.ogg binary

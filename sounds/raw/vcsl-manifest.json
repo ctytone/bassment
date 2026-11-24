@@ -1,0 +1,342 @@
+{
+ "piano": {
+  "C1": {
+   "file": "piano/C1.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_C1_vl3_rr1.wav"
+  },
+  "C2": {
+   "file": "piano/C2.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_C2_vl3_rr1.wav"
+  },
+  "C3": {
+   "file": "piano/C3.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_C3_vl3_rr1.wav"
+  },
+  "C4": {
+   "file": "piano/C4.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_C4_vl3_rr1.wav"
+  },
+  "C5": {
+   "file": "piano/C5.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_C5_vl3_rr1.wav"
+  },
+  "C6": {
+   "file": "piano/C6.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_C6_vl3_rr1.wav"
+  },
+  "E1": {
+   "file": "piano/E1.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_E1_vl3_rr1.wav"
+  },
+  "E2": {
+   "file": "piano/E2.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_E2_vl3_rr1.wav"
+  },
+  "E3": {
+   "file": "piano/E3.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_E3_vl3_rr1.wav"
+  },
+  "E4": {
+   "file": "piano/E4.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_E4_vl3_rr1.wav"
+  },
+  "E5": {
+   "file": "piano/E5.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_E5_vl3_rr1.wav"
+  },
+  "E6": {
+   "file": "piano/E6.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_E6_vl3_rr1.wav"
+  },
+  "G#1": {
+   "file": "piano/Gs1.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_G#1_vl3_rr1.wav"
+  },
+  "G#2": {
+   "file": "piano/Gs2.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_G#2_vl3_rr1.wav"
+  },
+  "G#3": {
+   "file": "piano/Gs3.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_G#3_vl3_rr1.wav"
+  },
+  "G#4": {
+   "file": "piano/Gs4.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_G#4_vl3_rr1.wav"
+  },
+  "G#5": {
+   "file": "piano/Gs5.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_G#5_vl3_rr1.wav"
+  },
+  "G#6": {
+   "file": "piano/Gs6.wav",
+   "source": "Chordophones/Zithers/Grand Piano, Steinway B/Sus/JHPiano_Sus_Close_G#6_vl3_rr1.wav"
+  }
+ },
+ "bells": {
+  "C5": {
+   "file": "bells/C5.wav",
+   "source": "Idiophones/Struck Idiophones/Glockenspiel/glock_loud_C5_01.wav"
+  },
+  "C6": {
+   "file": "bells/C6.wav",
+   "source": "Idiophones/Struck Idiophones/Glockenspiel/glock_loud_C6_01.wav"
+  },
+  "C7": {
+   "file": "bells/C7.wav",
+   "source": "Idiophones/Struck Idiophones/Glockenspiel/glock_loud_C7_01.wav"
+  },
+  "G#6": {
+   "file": "bells/Gs6.wav",
+   "source": "Idiophones/Struck Idiophones/Glockenspiel/glock_loud_G#6_01.wav"
+  },
+  "G4": {
+   "file": "bells/G4.wav",
+   "source": "Idiophones/Struck Idiophones/Glockenspiel/glock_loud_G4_01.wav"
+  },
+  "G5": {
+   "file": "bells/G5.wav",
+   "source": "Idiophones/Struck Idiophones/Glockenspiel/glock_loud_G5_01.wav"
+  },
+  "G6": {
+   "file": "bells/G6.wav",
+   "source": "Idiophones/Struck Idiophones/Glockenspiel/glock_medium_G6_01.wav"
+  }
+ },
+ "flute": {
+  "A#3": {
+   "file": "flute/As3.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Baroque Alto Recorder/Sustain/AltRecorder_Sus_A#3_rr1_Main.wav"
+  },
+  "A#4": {
+   "file": "flute/As4.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Baroque Alto Recorder/Sustain/AltRecorder_Sus_A#4_rr1_Main.wav"
+  },
+  "C4": {
+   "file": "flute/C4.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Baroque Alto Recorder/Sustain/AltRecorder_Sus_C4_rr1_Main.wav"
+  },
+  "C5": {
+   "file": "flute/C5.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Baroque Alto Recorder/Sustain/AltRecorder_Sus_C5_rr1_Main.wav"
+  },
+  "D4": {
+   "file": "flute/D4.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Baroque Alto Recorder/Sustain/AltRecorder_Sus_D4_rr1_Main.wav"
+  },
+  "D5": {
+   "file": "flute/D5.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Baroque Alto Recorder/Sustain/AltRecorder_Sus_D5_rr1_Main.wav"
+  },
+  "E4": {
+   "file": "flute/E4.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Baroque Alto Recorder/Sustain/AltRecorder_Sus_E4_rr1_Main.wav"
+  },
+  "E5": {
+   "file": "flute/E5.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Baroque Alto Recorder/Sustain/AltRecorder_Sus_E5_rr1_Main.wav"
+  },
+  "F#4": {
+   "file": "flute/Fs4.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Baroque Alto Recorder/Sustain/AltRecorder_Sus_F#4_rr1_Main.wav"
+  },
+  "F3": {
+   "file": "flute/F3.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Baroque Alto Recorder/Sustain/AltRecorder_Sus_F3_rr1_Main.wav"
+  },
+  "G#3": {
+   "file": "flute/Gs3.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Baroque Alto Recorder/Sustain/AltRecorder_Sus_G#3_rr1_Main.wav"
+  },
+  "G#4": {
+   "file": "flute/Gs4.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Baroque Alto Recorder/Sustain/AltRecorder_Sus_G#4_rr1_Main.wav"
+  }
+ },
+ "organ": {
+  "A2": {
+   "file": "organ/A2.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_A2_rr1.wav"
+  },
+  "A3": {
+   "file": "organ/A3.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_A3_rr1.wav"
+  },
+  "A4": {
+   "file": "organ/A4.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_A4_rr1.wav"
+  },
+  "A5": {
+   "file": "organ/A5.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_A5_rr1.wav"
+  },
+  "C2": {
+   "file": "organ/C2.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_C2_rr1.wav"
+  },
+  "C3": {
+   "file": "organ/C3.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_C3_rr1.wav"
+  },
+  "C4": {
+   "file": "organ/C4.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_C4_rr1.wav"
+  },
+  "C5": {
+   "file": "organ/C5.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_C5_rr1.wav"
+  },
+  "D#2": {
+   "file": "organ/Ds2.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_D#2_rr1.wav"
+  },
+  "D#3": {
+   "file": "organ/Ds3.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_D#3_rr1.wav"
+  },
+  "D#4": {
+   "file": "organ/Ds4.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_D#4_rr1.wav"
+  },
+  "D#5": {
+   "file": "organ/Ds5.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_D#5_rr1.wav"
+  },
+  "F#2": {
+   "file": "organ/Fs2.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_F#2_rr1.wav"
+  },
+  "F#3": {
+   "file": "organ/Fs3.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_F#3_rr1.wav"
+  },
+  "F#4": {
+   "file": "organ/Fs4.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_F#4_rr1.wav"
+  },
+  "F#5": {
+   "file": "organ/Fs5.wav",
+   "source": "Aerophones/Edge-blown Aerophones/Pipe Organ/Quiet/NT5_Man3Quiet_F#5_rr1.wav"
+  }
+ },
+ "kalimba": {
+  "A4": {
+   "file": "kalimba/A4.wav",
+   "source": "Idiophones/Plucked Idiophones/Kalimba, Kenya/Mbira6_Normal_MainSpirit_A4_k1_vl3_rr2.wav"
+  },
+  "B2": {
+   "file": "kalimba/B2.wav",
+   "source": "Idiophones/Plucked Idiophones/Kalimba, Kenya/Mbira6_Normal_MainSpirit_B2_k8_vl3_rr2.wav"
+  },
+  "B3": {
+   "file": "kalimba/B3.wav",
+   "source": "Idiophones/Plucked Idiophones/Kalimba, Kenya/Mbira6_Normal_MainSpirit_B3_k12_vl3_rr2.wav"
+  },
+  "B4": {
+   "file": "kalimba/B4.wav",
+   "source": "Idiophones/Plucked Idiophones/Kalimba, Kenya/Mbira6_Normal_MainSpirit_B4_k15_vl3_rr2.wav"
+  },
+  "C#3": {
+   "file": "kalimba/Cs3.wav",
+   "source": "Idiophones/Plucked Idiophones/Kalimba, Kenya/Mbira6_Normal_MainSpirit_C#3_k7_vl3_rr2.wav"
+  },
+  "C#4": {
+   "file": "kalimba/Cs4.wav",
+   "source": "Idiophones/Plucked Idiophones/Kalimba, Kenya/Mbira6_Normal_MainSpirit_C#4_k2_vl3_rr2.wav"
+  },
+  "D#3": {
+   "file": "kalimba/Ds3.wav",
+   "source": "Idiophones/Plucked Idiophones/Kalimba, Kenya/Mbira6_Normal_MainSpirit_D#3_k6_vl3_rr2.wav"
+  },
+  "D#4": {
+   "file": "kalimba/Ds4.wav",
+   "source": "Idiophones/Plucked Idiophones/Kalimba, Kenya/Mbira6_Normal_MainSpirit_D#4_k13_vl3_rr2.wav"
+  },
+  "F#3": {
+   "file": "kalimba/Fs3.wav",
+   "source": "Idiophones/Plucked Idiophones/Kalimba, Kenya/Mbira6_Normal_MainSpirit_F#3_k10_vl3_rr2.wav"
+  },
+  "F#4": {
+   "file": "kalimba/Fs4.wav",
+   "source": "Idiophones/Plucked Idiophones/Kalimba, Kenya/Mbira6_Normal_MainSpirit_F#4_k14_vl3_rr2.wav"
+  },
+  "G#3": {
+   "file": "kalimba/Gs3.wav",
+   "source": "Idiophones/Plucked Idiophones/Kalimba, Kenya/Mbira6_Normal_MainSpirit_G#3_k11_vl3_rr2.wav"
+  }
+ },
+ "harp": {
+  "A2": {
+   "file": "harp/A2.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_A2_f1.wav"
+  },
+  "A4": {
+   "file": "harp/A4.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_A4_f1.wav"
+  },
+  "A6": {
+   "file": "harp/A6.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_A6_f1.wav"
+  },
+  "B3": {
+   "file": "harp/B3.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_B3_f1.wav"
+  },
+  "B5": {
+   "file": "harp/B5.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_B5_f1.wav"
+  },
+  "B6": {
+   "file": "harp/B6.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_B6_f1.wav"
+  },
+  "C3": {
+   "file": "harp/C3.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_C3_f2.wav"
+  },
+  "C5": {
+   "file": "harp/C5.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_C5_f1.wav"
+  },
+  "D2": {
+   "file": "harp/D2.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_D2_f1.wav"
+  },
+  "D4": {
+   "file": "harp/D4.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_D4_f1.wav"
+  },
+  "D6": {
+   "file": "harp/D6.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_D6_f1.wav"
+  },
+  "E3": {
+   "file": "harp/E3.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_E3_f1.wav"
+  },
+  "E5": {
+   "file": "harp/E5.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_E5_f1.wav"
+  },
+  "F2": {
+   "file": "harp/F2.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_F2_f1.wav"
+  },
+  "F4": {
+   "file": "harp/F4.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_F4_f1.wav"
+  },
+  "F6": {
+   "file": "harp/F6.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_F6_f1.wav"
+  },
+  "G3": {
+   "file": "harp/G3.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_G3_f1.wav"
+  },
+  "G5": {
+   "file": "harp/G5.wav",
+   "source": "Chordophones/Composite Chordophones/Concert Harp/KSHarp_G5_f1.wav"
+  }
+ }
+}
