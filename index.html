@@ -224,6 +224,20 @@
   #audioState { font-family:var(--mono); font-size:12px; color:var(--dim); }
   #audioState[data-state="running"] { color:var(--ice); }
 
+  .progress { height:6px; background:var(--line); overflow:hidden; }
+  .progress i { display:block; height:100%; width:0; background:#2BFF5A; box-shadow:0 0 10px #2BFF5A; }
+  .progress i.rec { background:#FF1F3D; box-shadow:0 0 10px #FF1F3D; }
+  #loopStatus { font-size:12px; }
+  .seg { display:grid; grid-template-columns:repeat(4, 1fr); border:1px solid var(--line-hi); }
+  .seg button { border:0; border-radius:0; padding:7px 2px; font-size:13px; }
+  .seg button + button { border-left:1px solid var(--line-hi); }
+  .pair { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .toggles { display:flex; flex-direction:column; gap:6px; }
+  aside .toggle { display:flex; align-items:center; gap:9px; font-size:13px; color:var(--text); cursor:pointer; }
+  aside .toggle input { accent-color:var(--page); width:14px; height:14px; margin:0; }
+  .rbtn.blink { animation:blink .5s steps(1) infinite; }
+  @keyframes blink { 50% { filter:brightness(.3); } }
+
   .legend { display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--dim); border-top:1px solid var(--line); padding-top:16px; }
   .legend .key { display:flex; align-items:center; gap:9px; }
   .legend .key::before { content:''; flex:none; width:12px; height:12px; border:1px solid var(--k); background:color-mix(in srgb, var(--k) 30%, transparent); }
@@ -281,6 +295,21 @@
         <h2>Page</h2>
         <div id="tabs"></div>
       </section>
+      <section id="loopSection">
+        <h2>Loops <output id="loopStatus">No loops yet</output></h2>
+        <div class="progress"><i id="loopFill"></i></div>
+        <div class="seg" id="barsSeg">
+          <button data-bars="1">1 bar</button><button data-bars="2">2</button><button data-bars="4">4</button><button data-bars="8">8 bars</button>
+        </div>
+        <div class="pair">
+          <button id="loopPlay">▶ Play loops</button>
+          <button id="loopClear">Clear all</button>
+        </div>
+        <div class="toggles">
+          <label class="toggle"><input type="checkbox" id="snapToggle" checked> Snap to beat</label>
+          <label class="toggle"><input type="checkbox" id="clickToggle" checked> Click while recording</label>
+        </div>
+      </section>
       <section>
         <h2 id="soundTitle">Sound</h2>
         <div id="soundBtns"></div>
@@ -315,6 +344,10 @@
         <h2>Volume <output id="volOut">80</output></h2>
         <input type="range" id="vol" min="0" max="1" step="0.01" value="0.8" aria-label="Volume">
       </section>
+      <div class="pair">
+        <button id="stopAllBtn">■ Stop everything</button>
+        <button id="lightShow">Light show</button>
+      </div>
       <div class="diag">
         <button id="testSound">Test sound</button>
         <span id="audioState"></span>
@@ -330,10 +363,11 @@
   </div>
 
   <p class="help">
-    <b>Pages:</b> the bottom two round buttons on the right step through Drums, 808s and Melody (Session, User 1 and User 2 on the top row jump straight to them).
+    <b>Loops:</b> the 8 round buttons on the top row are loop tracks. Tap an empty one to record (one bar of count-in when nothing is playing, otherwise it starts at the next bar), and it loops when the bar count you picked is up. Tap a playing loop to mute or unmute it; hold it for a second to delete it. Loops can mix drums, 808s and melody, and keep playing while you change page.
+    <b>Pages:</b> the bottom two round buttons on the right step through the pages.
     <b>Drums:</b> each row is one kind of sound; the right-hand buttons pick a hi-hat roll speed, then hold any drum pad to roll it in time with the tempo.
     <b>808s and Melody:</b> a note plays for as long as you hold its pad; hold several pads to play them together. <b>Melody:</b> real recorded instruments.
-    On the 808 and Melody pages every pad is in the chosen minor key; the brighter pads are the root note. ◀ ▶ on the top row change the key, ▼ stops every sound.
+    On the 808 and Melody pages every pad is in the chosen minor key; the brighter pads are the root note. Key, tempo, Stop everything and the light show are in the panel.
     All sounds are CC0 (free to use in your own music): <a href="sounds/CREDITS.md">sound credits</a>.
   </p>
 
@@ -530,42 +564,209 @@ function rollStep() { return 60 / bpm * ROLLS[rollIdx].beats; }
 setInterval(() => {
   if (!ctx || !rolling.size) return;
   const horizon = ctx.currentTime + 0.1;
-  rolling.forEach(r => { while (r.next < horizon) { playDrum(r.row, r.col, r.next, 0.9); r.next += rollStep(); } });
+  rolling.forEach(r => { while (r.next < horizon) {
+    playDrum(r.row, r.col, r.next, 0.9);
+    recDrum(r.row, r.col, 0.9, r.next, ROLLS[rollIdx].beats);     // roll hits snap to the roll's own grid
+    r.next += rollStep();
+  } });
 }, 25);
 
 // ---- 808s and instruments: a note plays for as long as its pad is held, then fades out.
 // Pads held together all sound; quick taps don't pile up on each other.
 const noteVoices = new Map();    // pad key -> {voice, release}
-function noteOn(key, v, release) {
-  const prev = noteVoices.get(key); if (prev) prev.voice.stop(ctx.currentTime, 0.015);
-  if (v) noteVoices.set(key, {voice: track(v), release});
-}
-function noteOff(key) {
-  const n = noteVoices.get(key); if (!n) return;
-  n.voice.stop(ctx.currentTime, n.release); noteVoices.delete(key);
-}
-
 const BASS_RELEASE = 0.06;       // seconds the 808 takes to fade after you let go
-function bassRate(midi) { return Math.pow(2, (midi - BASSES[bassIdx].root) / 12); }
-function bassPress(key, midi, vel) {
-  noteOn(key, playSample(BASSES[bassIdx].file, ctx.currentTime, {rate: bassRate(midi), gain: vel}), BASS_RELEASE);
-}
-function bassRelease(key) { noteOff(key); }
-
-// ---- melodic instruments
 function nearestSample(folder, midi) {
   const list = instSamples[folder]; if (!list || !list.length) return null;
   let best = list[0];
   for (const s of list) if (Math.abs(s.midi - midi) < Math.abs(best.midi - midi)) best = s;
   return best;
 }
-function instPress(key, midi, vel) {
-  const I = INSTRUMENTS[instIdx], s = nearestSample(I.folder, midi); if (!s) return;
-  noteOn(key, playSample(s.key, ctx.currentTime, {rate: Math.pow(2, (midi - s.midi)/12), gain: I.gain * vel}), I.release);
+// one 808 or instrument note starting at time t; returns {voice, release}
+function makeNote(kind, sound, midi, t, vel) {
+  let v, release;
+  if (kind === 'bass') {
+    const B = BASSES[sound];
+    v = playSample(B.file, t, {rate: Math.pow(2, (midi - B.root) / 12), gain: vel}); release = BASS_RELEASE;
+  } else {
+    const I = INSTRUMENTS[sound], s = nearestSample(I.folder, midi); if (!s) return null;
+    v = playSample(s.key, t, {rate: Math.pow(2, (midi - s.midi) / 12), gain: I.gain * vel}); release = I.release;
+  }
+  return v ? {voice: track(v), release} : null;
 }
+function noteOn(key, kind, sound, midi, vel) {
+  const prev = noteVoices.get(key); if (prev) prev.voice.stop(ctx.currentTime, 0.015);
+  const n = makeNote(kind, sound, midi, ctx.currentTime, vel);
+  if (n) noteVoices.set(key, n);
+}
+function noteOff(key) {
+  const n = noteVoices.get(key); if (!n) return;
+  n.voice.stop(ctx.currentTime, n.release); noteVoices.delete(key);
+}
+function bassPress(key, midi, vel) { noteOn(key, 'bass', bassIdx, midi, vel); }
+function bassRelease(key) { noteOff(key); }
+function instPress(key, midi, vel) { noteOn(key, 'inst', instIdx, midi, vel); }
 function instRelease(key) { noteOff(key); }
 
+// =====================================================================
+// Looper: the 8 round buttons on the top row are 8 loop tracks.
+// A loop stores which pads were hit and when (in beats), not audio, so it
+// follows the tempo, can snap to the beat, and plays back at full quality.
+// =====================================================================
+let loopBars = 8, snap = true, clickOn = true;
+const SNAP = 0.25;                                  // a 1/16 note, in beats
+const slots = Array.from({length: 8}, () => ({state: 'empty', events: [], len: 0, origin: 0, playFrom: 0}));
+const transport = {running: false, startTime: 0};
+let schedUntil = 0;                                 // beat up to which loop events are already scheduled
+const loopVoices = new Map();                       // "slot:id" -> note playing from a loop
+const recHeld = new Map();                          // pad key -> note being recorded {slot, id, q, onBeat}
+let nextId = 1;
+
+const beatAt = t => (t - transport.startTime) * bpm / 60;
+const timeAt = b => transport.startTime + b * 60 / bpm;
+const wrapP = (p, len) => ((p % len) + len) % len;
+const quant = (x, grid) => snap ? Math.round(x / grid) * grid : x;
+const hasLoops = () => slots.some(s => s.state !== 'empty');
+const recSlot = () => slots.findIndex(s => s.state === 'armed' || s.state === 'recording');
+
+function slotTap(i) {
+  if (!ctx || !buffers.size) return;
+  const s = slots[i];
+  if (s.state === 'empty') armSlot(i);
+  else if (s.state === 'armed') { s.state = 'empty'; stopTransportIfIdle(); }
+  else if (s.state === 'recording') finishRecording(i);
+  else if (s.state === 'playing') { s.state = 'muted'; silenceSlot(i); }
+  else if (s.state === 'muted') s.state = 'playing';
+  refreshLoops();
+}
+function slotHold(i) { clearSlot(i); refreshLoops(); }
+
+function armSlot(i) {
+  slots.forEach((s, j) => { if (j !== i && s.state === 'armed') s.state = 'empty'; if (j !== i && s.state === 'recording') finishRecording(j); });
+  const s = slots[i];
+  s.len = loopBars * 4; s.events = [];
+  if (!transport.running) {                         // nothing playing yet: one bar of count-in, then record
+    transport.running = true;
+    transport.startTime = ctx.currentTime + 0.1 + 4 * 60 / bpm;
+    schedUntil = beatAt(ctx.currentTime);
+    s.origin = 0;
+  } else {                                          // loops already going: start at the next bar line
+    const b = beatAt(ctx.currentTime);
+    let o = Math.ceil(b / 4) * 4;
+    if (o - b > 3.75) o -= 4;                       // pressed just after a bar line: count it as on time
+    s.origin = o;
+  }
+  s.playFrom = s.origin + s.len;
+  s.state = 'armed';
+}
+function finishRecording(i) {
+  const s = slots[i];
+  recHeld.forEach((h, key) => {                     // notes still held when the loop ends get a note-off
+    if (h.slot !== i) return;
+    const dur = Math.min(Math.max(beatAt(ctx.currentTime) - h.onBeat, 0.05), s.len - 0.02);
+    s.events.push({type: 'off', id: h.id, p: wrapP(h.q + dur, s.len)});
+    recHeld.delete(key);
+  });
+  s.state = s.events.length ? 'playing' : 'empty';
+  if (s.state === 'empty') { log(`Loop ${i+1}: nothing was recorded.`); stopTransportIfIdle(); }
+}
+function silenceSlot(i) {
+  loopVoices.forEach((n, k) => { if (k.startsWith(i + ':')) { n.voice.stop(ctx.currentTime, 0.03); loopVoices.delete(k); } });
+}
+function clearSlot(i) {
+  silenceSlot(i);
+  recHeld.forEach((h, key) => { if (h.slot === i) recHeld.delete(key); });
+  Object.assign(slots[i], {state: 'empty', events: [], len: 0, origin: 0, playFrom: 0});
+  stopTransportIfIdle();
+}
+function stopTransportIfIdle() { if (!hasLoops()) transport.running = false; }
+function stopLoops() {
+  slots.forEach((s, i) => { if (s.state === 'recording') finishRecording(i); if (s.state === 'armed') s.state = 'empty'; });
+  transport.running = false;
+  loopVoices.forEach(n => n.voice.stop(ctx.currentTime, 0.03)); loopVoices.clear();
+  refreshLoops();
+}
+function playLoops() {
+  if (!ctx || transport.running || !hasLoops()) return;
+  const used = slots.filter(s => s.state !== 'empty');
+  const shift = Math.min(...used.map(s => s.origin));        // restart from the earliest loop's first beat
+  used.forEach(s => { s.origin -= shift; s.playFrom = -Infinity; });
+  transport.running = true;
+  transport.startTime = ctx.currentTime + 0.06;
+  schedUntil = beatAt(ctx.currentTime);
+  refreshLoops();
+}
+function clearAllLoops() { slots.forEach((_, i) => clearSlot(i)); transport.running = false; refreshLoops(); }
+
+// ---- recording what you play
+function recPos(i, t) {                             // position in the loop for something played at time t, or null
+  const s = slots[i]; let rel = beatAt(t) - s.origin;
+  if (s.state === 'armed') { if (rel >= -SNAP && rel < 0) rel = 0; else return null; }   // a hair early still counts
+  return rel >= 0 && rel < s.len ? rel : null;
+}
+function recDrum(row, col, vel, t, grid = SNAP) {
+  const i = recSlot(); if (i < 0 || !transport.running) return;
+  const rel = recPos(i, t); if (rel == null) return;
+  slots[i].events.push({type: 'drum', row, col, vel, p: wrapP(quant(rel, grid), slots[i].len)});
+}
+function recNoteOn(key, kind, sound, midi, vel) {
+  const i = recSlot(); if (i < 0 || !transport.running) return;
+  const rel = recPos(i, ctx.currentTime); if (rel == null) return;
+  const q = quant(rel, SNAP), id = nextId++;
+  slots[i].events.push({type: 'on', id, kind, sound, midi, vel, p: wrapP(q, slots[i].len)});
+  recHeld.set(key, {slot: i, id, q, onBeat: beatAt(ctx.currentTime)});
+}
+function recNoteOff(key) {
+  const h = recHeld.get(key); if (!h) return; recHeld.delete(key);
+  const s = slots[h.slot]; if (s.state === 'empty') return;
+  const dur = Math.min(Math.max(beatAt(ctx.currentTime) - h.onBeat, 0.05), s.len - 0.02);
+  s.events.push({type: 'off', id: h.id, p: wrapP(h.q + dur, s.len)});
+}
+
+// ---- metronome click (a short synthesized tick)
+function click(t, accent) {
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.frequency.value = accent ? 1760 : 1175;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(accent ? 0.5 : 0.3, t + 0.002);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+  o.connect(g).connect(master); o.start(t); o.stop(t + 0.06);
+}
+
+// ---- the scheduler: looks a little ahead and books every loop event at an exact time
+setInterval(() => {
+  if (!ctx || !transport.running) return;
+  const now = beatAt(ctx.currentTime), to = beatAt(ctx.currentTime + 0.12), from = schedUntil;
+  if (to <= from) return;
+  let changed = false;
+  slots.forEach((s, i) => {
+    if (s.state === 'armed' && now >= s.origin) { s.state = 'recording'; changed = true; }
+    if (s.state === 'recording' && now >= s.origin + s.len) { finishRecording(i); changed = true; }
+  });
+  const recording = recSlot() >= 0;
+  for (let k = Math.ceil(from); k < to; k++)        // clicks: always during the count-in, otherwise only while recording
+    if (k < 0 || (clickOn && recording)) click(timeAt(k), ((k % 4) + 4) % 4 === 0);
+  const due = [];
+  slots.forEach((s, i) => {
+    if (s.state !== 'playing' && s.state !== 'recording') return;
+    const lo = Math.max(from, s.playFrom);
+    if (to <= lo) return;
+    s.events.forEach(e => {
+      for (let n = Math.ceil((lo - s.origin - e.p) / s.len), B; (B = s.origin + e.p + n * s.len) < to; n++)
+        if (B >= lo) due.push({B, i, e});
+    });
+  });
+  due.sort((a, b) => a.B - b.B || (a.e.type === 'off' ? -1 : 1));
+  due.forEach(({B, i, e}) => {
+    const t = Math.max(timeAt(B), ctx.currentTime);
+    if (e.type === 'drum') playDrum(e.row, e.col, t, e.vel);
+    else if (e.type === 'on') { const n = makeNote(e.kind, e.sound, e.midi, t, e.vel); if (n) loopVoices.set(i + ':' + e.id, n); }
+    else { const n = loopVoices.get(i + ':' + e.id); if (n) { n.voice.stop(t, n.release); loopVoices.delete(i + ':' + e.id); } }
+  });
+  schedUntil = to;
+  if (changed) refreshLoops();
+}, 25);
+
 function stopAll() {
+  stopLoops();
   rolling.clear();
   active.forEach(v => v.stop()); active.clear(); drumVoices.clear(); noteVoices.clear();
   Object.values(padEls).forEach(el => el.classList.remove('hit'));
@@ -584,9 +785,10 @@ function press(row, col, vel = 1) {
   flash(key, true);
   if (info.kind === 'drum') {
     playDrum(row, col, ctx.currentTime, vel);
+    recDrum(row, col, vel, ctx.currentTime);
     if (ROLLS[rollIdx].beats) rolling.set(key, {row, col, next: ctx.currentTime + rollStep()});
-  } else if (info.kind === 'bass') bassPress(key, info.midi, vel);
-  else instPress(key, info.midi, vel);
+  } else if (info.kind === 'bass') { bassPress(key, info.midi, vel); recNoteOn(key, 'bass', bassIdx, info.midi, vel); }
+  else { instPress(key, info.midi, vel); recNoteOn(key, 'inst', instIdx, info.midi, vel); }
 }
 function release(row, col) {
   const key = row*10 + col;
@@ -594,8 +796,7 @@ function release(row, col) {
   const was = PAGES[pressedOn.get(key)].id; pressedOn.delete(key);
   flash(key, false);
   if (was === 'drums') rolling.delete(key);
-  else if (was === 'bass') bassRelease(key);
-  else instRelease(key);
+  else { if (was === 'bass') bassRelease(key); else instRelease(key); recNoteOff(key); }
 }
 
 function selectSlot(i) {
@@ -635,7 +836,12 @@ function changeOctave(d) {
   octave[pid] = Math.max(-2, Math.min(2, octave[pid] + d));
   renderPads(); refreshUI(); paintLaunchpad();
 }
-function changeBpm(d) { bpm = Math.max(60, Math.min(200, bpm + d)); refreshUI(); }
+function changeBpm(d) {
+  const b = transport.running ? beatAt(ctx.currentTime) : 0;
+  bpm = Math.max(60, Math.min(200, bpm + d));
+  if (transport.running) transport.startTime = ctx.currentTime - b * 60 / bpm;   // keep loops on the same beat
+  refreshUI();
+}
 
 // =====================================================================
 // On-screen device
@@ -670,32 +876,37 @@ function renderPads(boot) {
   if (boot) { gridEl.classList.remove('boot'); void gridEl.offsetWidth; gridEl.classList.add('boot'); }
 }
 
-// Top row: CC 104-111 on the MK2
-const TOP = [
-  {label:'▲', big:true, led:LED.red,    title:'Rainbow light show', action:() => rainbow()},
-  {label:'▼', big:true, led:LED.white,  title:'Stop all sounds',    action:() => stopAll()},
-  {label:'◀', big:true, led:LED.orange, title:'Key down',           action:() => changeKey(-1)},
-  {label:'▶', big:true, led:LED.orange, title:'Key up',             action:() => changeKey(1)},
-  {label:'Drums',  page:0, title:'Drums page'},
-  {label:'808s',   page:1, title:'808 page'},
-  {label:'Melody', page:2, title:'Melody page'},
-  {label:''},
-];
-const topEls = TOP.map((t, i) => {
+// Top row (CC 104-111 on the MK2): the 8 loop tracks. Tap = record / mute / unmute, hold = delete.
+const HOLD_MS = 700;
+const topHold = new Map();       // button -> hold timer (null once the hold has fired)
+function topDown(i) {
+  if (topHold.has(i)) return;
+  topHold.set(i, setTimeout(() => { topHold.set(i, null); slotHold(i); }, HOLD_MS));
+}
+function topUp(i) {
+  if (!topHold.has(i)) return;
+  const tm = topHold.get(i); topHold.delete(i);
+  if (tm) { clearTimeout(tm); slotTap(i); }
+}
+const topEls = slots.map((_, i) => {
   const b = document.createElement('div');
-  b.className = 'rbtn' + (t.big ? ' big' : ''); b.textContent = t.label; if (t.title) b.title = t.title;
-  if (t.action || t.page != null) b.addEventListener('click', () => topPress(i));
+  b.className = 'rbtn big'; b.textContent = i + 1;
+  b.addEventListener('pointerdown', e => { e.preventDefault(); b.setPointerCapture?.(e.pointerId); topDown(i); });
+  b.addEventListener('pointerup', () => topUp(i));
+  b.addEventListener('lostpointercapture', () => topUp(i));
   topEl.appendChild(b); return b;
 });
-function topPress(i) {
-  const t = TOP[i]; if (!t) return;
-  if (t.action) t.action(); else if (t.page != null) setPage(t.page);
+// light for each loop button: dark = empty, flashing yellow = count-in, flashing red = recording, green = playing, dim yellow = muted
+function slotLight(i) {
+  switch (slots[i].state) {
+    case 'armed':     return {led: LED.yellow, flash: true,  title: 'Waiting to record (tap to cancel)'};
+    case 'recording': return {led: LED.red,    flash: true,  title: 'Recording (tap to finish early)'};
+    case 'playing':   return {led: LED.green,  flash: false, title: 'Playing (tap to mute, hold to delete)'};
+    case 'muted':     return {led: 15,         flash: false, title: 'Muted (tap to unmute, hold to delete)'};
+    default:          return {led: LED.off,    flash: false, title: 'Empty (tap to record)'};
+  }
 }
-function topLED(i) {
-  const t = TOP[i];
-  if (t.page != null) return t.page === page ? PAGES[t.page].led : LED.dimwhite;
-  return t.led ?? LED.off;
-}
+function topLED(i) { return slotLight(i).led; }
 function sidePress(note) {
   if (note === PREV_NOTE) return setPage(page - 1);
   if (note === NEXT_NOTE) return setPage(page + 1);
@@ -708,7 +919,7 @@ function sideLED(note) {
 }
 
 // MK2 colour index -> screen colour, for the round buttons
-const LED_HEX = {0:'#3a3b40', 1:'#8a8d96', 3:'#e9ecf2', 5:'#FF1F3D', 9:'#FF8A00', 13:'#FFC857', 21:'#2BFF5A', 37:'#5CE1FF', 45:'#2F5BFF', 49:'#B04DFF', 57:'#FF3DCB'};
+const LED_HEX = {0:'#3a3b40', 1:'#8a8d96', 3:'#e9ecf2', 5:'#FF1F3D', 9:'#FF8A00', 13:'#FFC857', 15:'#8a7430', 21:'#2BFF5A', 37:'#5CE1FF', 45:'#2F5BFF', 49:'#B04DFF', 57:'#FF3DCB'};
 function paintRound(el, led, glow) {
   el.style.setProperty('--led', LED_HEX[led] || '#3a3b40');
   el.classList.toggle('lit', led !== LED.off);
@@ -730,6 +941,13 @@ document.getElementById('keyUp').onclick = () => changeKey(1);
 document.getElementById('keyDown').onclick = () => changeKey(-1);
 document.getElementById('bpmUp').onclick = () => changeBpm(5);
 document.getElementById('bpmDown').onclick = () => changeBpm(-5);
+[...document.getElementById('barsSeg').children].forEach(b => b.onclick = () => { loopBars = +b.dataset.bars; refreshLoops(); });
+document.getElementById('loopPlay').onclick = () => transport.running ? stopLoops() : playLoops();
+document.getElementById('loopClear').onclick = () => clearAllLoops();
+document.getElementById('snapToggle').onchange = e => { snap = e.target.checked; };
+document.getElementById('clickToggle').onchange = e => { clickOn = e.target.checked; };
+document.getElementById('stopAllBtn').onclick = () => stopAll();
+document.getElementById('lightShow').onclick = () => rainbow();
 document.getElementById('octUp').onclick = () => changeOctave(1);
 document.getElementById('octDown').onclick = () => changeOctave(-1);
 const volEl = document.getElementById('vol');
@@ -743,7 +961,7 @@ showVol();
 function refreshUI() {
   const pid = PAGES[page].id, items = slotItems(), sel = slotSelected();
   [...tabsEl.children].forEach((b, i) => b.classList.toggle('on', i === page));
-  document.getElementById('pageTag').textContent = `Page ${page+1} / 3 · ${PAGES[page].name}`;
+  document.getElementById('pageTag').textContent = `Page ${page+1} / ${PAGES.length} · ${PAGES[page].name}`;
   document.getElementById('soundTitle').textContent = pid === 'drums' ? 'Hi-hat roll (hold a drum pad)' : pid === 'bass' ? '808' : 'Instrument';
   [...soundBtns.children].forEach((b, i) => { b.textContent = items[i].name; b.classList.toggle('on', i === sel); });
   document.getElementById('keyLabel').textContent = KEYS[keyRoot] + ' min';
@@ -761,7 +979,7 @@ function refreshUI() {
     b.title = n === PREV_NOTE ? 'Previous page' : n === NEXT_NOTE ? 'Next page' : i >= 0 ? items[i].name : '';
     if (!document.body.classList.contains('rainbow')) paintRound(b, sideLED(n), i === sel);
   });
-  topEls.forEach((el, i) => { if (!document.body.classList.contains('rainbow')) paintRound(el, topLED(i), TOP[i].page === page || i === 0); });
+  refreshLoops();
 
   // legend
   const lg = document.getElementById('legend');
@@ -772,6 +990,44 @@ function refreshUI() {
   lg.innerHTML = html + `<label class="toggle"><input type="checkbox" id="labels" ${document.body.classList.contains('no-labels') ? '' : 'checked'}> Show names on pads</label>`;
   document.getElementById('labels').onchange = e => document.body.classList.toggle('no-labels', !e.target.checked);
 }
+// loop buttons on screen, the loop panel, and the Launchpad's top row
+function refreshLoops() {
+  if (!document.body.classList.contains('rainbow'))
+    topEls.forEach((el, i) => {
+      const L = slotLight(i);
+      paintRound(el, L.led, slots[i].state === 'playing');
+      el.classList.toggle('blink', L.flash);
+      el.title = `Loop ${i+1}: ${L.title}`;
+    });
+  [...document.getElementById('barsSeg').children].forEach(b => b.classList.toggle('on', +b.dataset.bars === loopBars));
+  document.getElementById('loopPlay').textContent = transport.running ? '■ Stop loops' : '▶ Play loops';
+  document.getElementById('loopPlay').disabled = !transport.running && !hasLoops();
+  document.getElementById('loopClear').disabled = !hasLoops();
+  if (lpOut && !rainbowTimer) slots.forEach((_, i) => { const L = slotLight(i); sendCC(104 + i, L.led, L.flash); });
+}
+// running position readout (count-in, bar number, progress bar)
+(function loopReadout() {
+  const st = document.getElementById('loopStatus'), fill = document.getElementById('loopFill');
+  let text = 'No loops yet', frac = 0;
+  if (ctx && transport.running) {
+    const b = beatAt(ctx.currentTime), r = recSlot();
+    if (b < 0) text = `Count-in ${Math.ceil(-b)}`;
+    else if (r >= 0 && slots[r].state === 'armed') text = `Loop ${r+1} starts in ${Math.ceil(slots[r].origin - b)}`;
+    else {
+      const ref = r >= 0 ? slots[r] : slots.filter(s => s.state === 'playing' || s.state === 'muted').sort((a, c) => c.len - a.len)[0];
+      if (ref) {
+        const pos = wrapP(b - ref.origin, ref.len);
+        frac = pos / ref.len;
+        text = `${r >= 0 ? `Recording loop ${r+1}` : 'Playing'} · bar ${Math.floor(pos / 4) + 1} / ${ref.len / 4}`;
+      }
+    }
+  } else if (hasLoops()) text = 'Stopped';
+  st.textContent = text;
+  fill.style.width = (frac * 100) + '%';
+  fill.classList.toggle('rec', recSlot() >= 0);
+  requestAnimationFrame(loopReadout);
+})();
+
 function shortName(n) { return n.replace(' 808', '').replace('Distorted', 'Dist').replace('Dalmatian', 'Dalm').replace('Superbass', 'Super').replace('Roll off', 'Off').replace('Dark Organ', 'Organ'); }
 
 function flash(key, on) {
@@ -780,7 +1036,7 @@ function flash(key, on) {
 }
 
 // =====================================================================
-// Rainbow light show (top-left red button)
+// Rainbow light show (Light show button in the panel)
 // =====================================================================
 const RAINBOW = [
   {hex:'#FF1F3D', led:5}, {hex:'#FF8A00', led:9}, {hex:'#FFE600', led:13}, {hex:'#2BFF5A', led:21},
@@ -824,21 +1080,26 @@ let lpOut = null;
 // Only send a light when its colour actually changes: keeps MIDI traffic to the Launchpad low,
 // so Windows' MIDI service is never flooded (page changes and the rainbow used to send ~80 messages at once).
 const sentLED = new Map();
-function sendRaw(status, n, color) {
-  const id = status * 256 + n;
-  if (!lpOut || sentLED.get(id) === color) return;
-  sentLED.set(id, color);
-  try { lpOut.send([status, n, color]); } catch(e){}
+function cachedSend(id, val, fn) {
+  if (!lpOut || sentLED.get(id) === val) return;
+  sentLED.set(id, val);
+  try { fn(); } catch(e){}
 }
-function sendLED(note, color) { sendRaw(0x90, note, color); }
-function sendCC(cc, color)    { sendRaw(0xB0, cc, color); }
+function sendLED(note, color) { cachedSend('n' + note, color, () => lpOut.send([0x90, note, color])); }
+// flash: the MK2 blinks a light by itself when its colour is sent on MIDI channel 2, so blinking costs no extra messages
+function sendCC(cc, color, flash = false) {
+  cachedSend('c' + cc, (flash ? 'f' : '') + color, () => {
+    if (flash) { lpOut.send([0xB0, cc, 0]); lpOut.send([0xB1, cc, color]); }
+    else lpOut.send([0xB0, cc, color]);
+  });
+}
 function paintLaunchpad() {
   if (!lpOut || rainbowTimer) return;
   for (let r=1;r<=8;r++) {
     for (let c=1;c<=8;c++) sendLED(r*10+c, pressedOn.has(r*10+c) ? LED.white : padInfo(r,c).led);
     sendLED(r*10+9, sideLED(r*10+9));
   }
-  TOP.forEach((t, i) => sendCC(104+i, topLED(i)));
+  slots.forEach((_, i) => { const L = slotLight(i); sendCC(104 + i, L.led, L.flash); });
 }
 
 const logEl = document.getElementById('log');
@@ -876,7 +1137,7 @@ function noteToPad(note) {
 }
 function handleMIDI(cmd, note, vel) {
   if (ctx && ctx.state !== 'running') ctx.resume();
-  if (cmd === 0xB0 && note >= 104 && note <= 111) { if (vel > 0) topPress(note - 104); return; }
+  if (cmd === 0xB0 && note >= 104 && note <= 111) { if (vel > 0) topDown(note - 104); else topUp(note - 104); return; }
   const on = cmd === 0x90 && vel > 0, off = cmd === 0x80 || (cmd === 0x90 && vel === 0);
   if (!on && !off) return;
   if (note % 10 === 9 && note >= 19 && note <= 89) { if (on) sidePress(note); return; }
