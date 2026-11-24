@@ -122,6 +122,113 @@ Files are Freesound's high-quality previews (OGG). Original uploads are linked.
 | Headz 808 | Headz 808.wav | ? | https://freesound.org/s/521145/ |
 | Dalmatian 808 | 808_dalmation_C.wav | ? | https://freesound.org/s/646403/ |
 
+## Freesound.org: acoustic kit (page 4)
+
+
+### Kick drums
+
+| Pad name | Original title | By | Link |
+|---|---|---|---|
+| Acoustic Kick | acoustic kick.wav | ? | https://freesound.org/s/371192/ |
+| Studio Kick | acoustic kick.wav | ? | https://freesound.org/s/82279/ |
+| Room Kick | kick.wav | ? | https://freesound.org/s/82309/ |
+| Tight Kick | kick 2.wav | ? | https://freesound.org/s/82313/ |
+| Swedish Kick | kick swedish.wav | ? | https://freesound.org/s/264601/ |
+| Soft Kick | Bass Kick drum Soft Hit.wav | ? | https://freesound.org/s/124998/ |
+| Full Kick | Bass kick drum normal.wav | ? | https://freesound.org/s/125028/ |
+| Punch Kick | Stereo Processed Bass Kick Drum 2 .wav | ? | https://freesound.org/s/46528/ |
+
+### Snares
+
+| Pad name | Original title | By | Link |
+|---|---|---|---|
+| Ludwig Snare | Ludwig Black Beauty Snare Drum Unprocessed.wav | ? | https://freesound.org/s/46566/ |
+| Ghost Note | Ludwig Black Beauty Snare Ghost Notes Unprocessed.wav | ? | https://freesound.org/s/46567/ |
+| Studio Snare 1 | Stereo Processed Snare Drum 1 .wav | ? | https://freesound.org/s/46529/ |
+| Studio Snare 2 | Stereo Processed Snare Drum 4.wav | ? | https://freesound.org/s/46532/ |
+| Acoustic Snare | acoustic snare.wav | ? | https://freesound.org/s/82249/ |
+| Fat Snare | Snare Drum.wav | ? | https://freesound.org/s/82238/ |
+| Rock Snare | snare rock 2.wav | ? | https://freesound.org/s/264859/ |
+| Wood Snare | Wood Snare (Sample 3).wav | ? | https://freesound.org/s/173087/ |
+
+### Rimshots + sticks
+
+| Pad name | Original title | By | Link |
+|---|---|---|---|
+| Open Rimshot | Ludwig Black Beauty Snare Drum Open Rimshot Unprocessed.wav | ? | https://freesound.org/s/46565/ |
+| Closed Rimshot | Ludwig Black Beauty Snare Drum Closed Rimshot Unprocessed.wav | ? | https://freesound.org/s/46564/ |
+| Rimshot | acoustic snare rimshot.wav | ? | https://freesound.org/s/82281/ |
+| Side Stick | acoustic side stick.wav | ? | https://freesound.org/s/82280/ |
+| Cross Stick 1 | JP Cross-Stick 3.wav | ? | https://freesound.org/s/476373/ |
+| Cross Stick 2 | JP Cross-Stick 1.wav | ? | https://freesound.org/s/476375/ |
+| Soul Snare | BARRY WHITE SNARE 3.wav | ? | https://freesound.org/s/82234/ |
+| Tight Snare | snare 2.wav | ? | https://freesound.org/s/209889/ |
+
+### Toms
+
+| Pad name | Original title | By | Link |
+|---|---|---|---|
+| Oak High | Yamaha Oak Custom Tom High.wav | ? | https://freesound.org/s/46552/ |
+| Oak Mid | Yamaha Oak Custom Tom Mid.wav | ? | https://freesound.org/s/46554/ |
+| Oak Low | Yamaha Oak Custom Tom Low.wav | ? | https://freesound.org/s/46553/ |
+| Maple High | Yamaha Maple Custom Tom High.wav | ? | https://freesound.org/s/46549/ |
+| Maple Mid | Yamaha Maple Custom Tom Mid.wav | ? | https://freesound.org/s/46551/ |
+| Maple Low | Yamaha Maple Custom Tom Low.wav | ? | https://freesound.org/s/46550/ |
+| Beech High | Yamaha Beech Custom Tom High.wav | ? | https://freesound.org/s/46546/ |
+| Beech Low | Yamaha Beech Custom Tom Low.wav | ? | https://freesound.org/s/46547/ |
+
+### Closed hi-hats
+
+| Pad name | Original title | By | Link |
+|---|---|---|---|
+| Closed Hat | Zildjian A Custom Hi-Hat Cymbals Closed Hit.WAV | ? | https://freesound.org/s/45664/ |
+| Pedal Chick | Zildjian A Custom Hi-Hat Cymbals Pedal Chic.WAV | ? | https://freesound.org/s/45668/ |
+| Loose Hat | Zildjian A Custom Hi-Hat Cymbals Loose Hit.WAV | ? | https://freesound.org/s/45666/ |
+| Edge Hat | SkibaCustomHiHats1145Top1215BottomClosedEdgeShank.wav | ? | https://freesound.org/s/93909/ |
+| Tip Hat | SkibaCustomHiHats1145Top1215BottomClosedBowTip.wav | ? | https://freesound.org/s/93908/ |
+| Foot Close | SkibaCustomHiHats1145Top1215BottomFootPedalCloseChick.wav | ? | https://freesound.org/s/93910/ |
+| Hat Hit | Hi-Hat Hit  | ? | https://freesound.org/s/132415/ |
+| Bright Hat | 14CHH.wav | ? | https://freesound.org/s/321454/ |
+
+### Open hi-hats
+
+| Pad name | Original title | By | Link |
+|---|---|---|---|
+| Open Hat | Zildjian A Custom Hi-Hat Cymbals Open Hit.WAV | ? | https://freesound.org/s/45667/ |
+| Foot Splash | Zildjian A Custom Hi-Hat Cymbals Foot-Splash.WAV | ? | https://freesound.org/s/45665/ |
+| Open Edge | SkibaCustomHiHats1145Top1215BottomOpenEdgeShank.wav | ? | https://freesound.org/s/93913/ |
+| Full Open | SkibaCustomHiHats1145Top1215BottomFullOpenTip.wav | ? | https://freesound.org/s/93912/ |
+| Semi Open | HHAT Paiste 302+ 14'' semi open FF.wav | ? | https://freesound.org/s/104230/ |
+| Paiste Open | HHAT Paiste 302+ 14'' open FF.wav | ? | https://freesound.org/s/104225/ |
+| Paiste Open 2 | HHAT Paiste 302+ 14'' open F].wav | ? | https://freesound.org/s/104226/ |
+| Wide Open | hihat_open4.wav | ? | https://freesound.org/s/45065/ |
+
+### Crashes + china
+
+| Pad name | Original title | By | Link |
+|---|---|---|---|
+| Paiste Crash | CRASH FAST 16 PAISTE SIGNATURE.wav | ? | https://freesound.org/s/60990/ |
+| Left Crash | left crash.wav | ? | https://freesound.org/s/209872/ |
+| Right Crash | right crash.wav | ? | https://freesound.org/s/209871/ |
+| High Crash | crash hi 16.wav | ? | https://freesound.org/s/209865/ |
+| Small Crash | crash 11.wav | ? | https://freesound.org/s/209866/ |
+| China | crash - china cymbal 1.wav | ? | https://freesound.org/s/264532/ |
+| Sabian China | Sabian_AAX_Chinese_3.wav | ? | https://freesound.org/s/209868/ |
+| Splash | Zildjian 8 inch K Custom Dark Splash Cymbal.wav | ? | https://freesound.org/s/46647/ |
+
+### Ride + percussion
+
+| Pad name | Original title | By | Link |
+|---|---|---|---|
+| Sizzle Ride | Zildjian Transitional Stamp Sizzle Ride Cymbal Bell Hit.wav | ? | https://freesound.org/s/46446/ |
+| K Ride | KZildjianIstanbul20Ride2220GramsSkibaModifiedBell.wav | ? | https://freesound.org/s/93904/ |
+| Ride Bell | bell 1.wav | ? | https://freesound.org/s/209894/ |
+| Ride Tip | ride n1.wav | ? | https://freesound.org/s/209900/ |
+| Tambourine | Tambourine_Single_Hit_1.wav | ? | https://freesound.org/s/219266/ |
+| Tambourine 2 | Tambourine_Single_Hit_ 2.wav | ? | https://freesound.org/s/219263/ |
+| Cowbell | Cowbell_OS_5.aif | ? | https://freesound.org/s/159765/ |
+| Splash 2 | Zildjian 8 inch K Custom Dark Splash Cymbal Bell.wav | ? | https://freesound.org/s/46646/ |
+
 ## VCSL: Versilian Community Sample Library (melody page)
 
 By Versilian Studios and contributors, CC0. https://github.com/sgossner/VCSL

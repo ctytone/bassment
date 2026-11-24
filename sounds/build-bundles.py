@@ -9,6 +9,7 @@ BUNDLES = {
     'drums':  ['kicks', 'snares', 'claps', 'hats', 'opens', 'percs', 'dark', 'fx'],
     'bass':   ['bass'],
     'melody': ['piano', 'bells', 'flute', 'organ', 'kalimba', 'harp'],
+    'acoustic': ['ac-kicks', 'ac-snares', 'ac-sticks', 'ac-toms', 'ac-closed', 'ac-open', 'ac-crash', 'ac-ride'],
 }
 for bundle, folders in BUNDLES.items():
     parts = ['window.LP_SAMPLES = window.LP_SAMPLES || {};']

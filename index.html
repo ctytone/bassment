@@ -192,8 +192,8 @@
   aside button.on { background:var(--page); border-color:var(--page); color:var(--void); box-shadow:0 0 14px color-mix(in srgb, var(--page) 45%, transparent); }
   aside button:disabled { opacity:.35; cursor:default; }
 
-  #tabs { display:grid; grid-template-columns:repeat(3, 1fr); gap:0; border:1px solid var(--line-hi); }
-  #tabs button { border:0; border-radius:0; font-weight:600; letter-spacing:.03em; padding:10px 4px; }
+  #tabs { display:grid; grid-template-columns:repeat(4, 1fr); gap:0; border:1px solid var(--line-hi); }
+  #tabs button { border:0; border-radius:0; font-weight:600; letter-spacing:.01em; padding:10px 2px; font-size:13px; }
   #tabs button + button { border-left:1px solid var(--line-hi); }
   #tabs button.on { background:var(--tab); color:var(--void); box-shadow:0 0 16px color-mix(in srgb, var(--tab) 45%, transparent); }
   #soundBtns { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
@@ -365,7 +365,7 @@
   <p class="help">
     <b>Loops:</b> the 8 round buttons on the top row are loop tracks. Tap an empty one to record (one bar of count-in when nothing is playing, otherwise it starts at the next bar), and it loops when the bar count you picked is up. Tap a playing loop to mute or unmute it; hold it for a second to delete it. Loops can mix drums, 808s and melody, and keep playing while you change page.
     <b>Pages:</b> the bottom two round buttons on the right step through the pages.
-    <b>Drums:</b> each row is one kind of sound; the right-hand buttons pick a hi-hat roll speed, then hold any drum pad to roll it in time with the tempo.
+    <b>Drums and Acoustic:</b> each row is one kind of sound (Acoustic is a real drum kit, one kit piece per row); the right-hand buttons pick a hi-hat roll speed, then hold any drum pad to roll it in time with the tempo.
     <b>808s and Melody:</b> a note plays for as long as you hold its pad; hold several pads to play them together. <b>Melody:</b> real recorded instruments.
     On the 808 and Melody pages every pad is in the chosen minor key; the brighter pads are the root note. Key, tempo, Stop everything and the light show are in the panel.
     All sounds are CC0 (free to use in your own music): <a href="sounds/CREDITS.md">sound credits</a>.
@@ -382,12 +382,25 @@ const DRUM_ROWS = [
   {group:'kicks',  label:'Kicks',        hex:'#FF1F3D', led:5,  names:['TR-08 Kick','808 Kick','Trappy Kick','Trap Kick 1','Trap Kick 2','Subby Kick','Dist Boom','Punch Kick']},
   {group:'snares', label:'Snares',       hex:'#FF8A00', led:9,  names:['TR-08 Snare','Trap Snare 1','Trap Snare 2','Trap Snare 3','AI Snare','Snare Trap','Mini Lex Snare','Big Trap Snare']},
   {group:'claps',  label:'Claps',        hex:'#FFE600', led:13, names:['TR-08 Clap','Fat Clap','Clap Snare','Combo Clap','Caviar Clap','Dance Clap','Fan Clap','Bark Clap']},
-  {group:'hats',   label:'Closed hats',  hex:'#2BFF5A', led:21, names:['TR-08 Hat','Tight Hat 1','Tight Hat 2','Tight Hat 3','Tight Hat 4','Zildjian Hat','Clean Hat','Glitch Hat']},
+  {group:'hats',   label:'Closed hats',  hex:'#2BFF5A', led:21, chokes:{row:5, cols:[1,2,3,4,5,6]}, names:['TR-08 Hat','Tight Hat 1','Tight Hat 2','Tight Hat 3','Tight Hat 4','Zildjian Hat','Clean Hat','Glitch Hat']},
   {group:'opens',  label:'Open hats + cymbals', hex:'#00E5FF', led:37, names:['TR-08 Open','909 Open','Dance Open','Semi Open','Open Hat','Open Hat 2','TR-08 Crash','Rev Crash']},
-  {group:'percs',  label:'Percussion',   hex:'#2F5BFF', led:45, names:['Rim','Clave','Cowbell','Maracas','Low Conga','Mid Conga','Low Tom','Mid Tom']},
-  {group:'dark',   label:'Underground',  hex:'#B04DFF', led:49, names:['Dist 808 Hit','Phonk Bell 1','Phonk Bell 2','Dirty Kick','Dist Boom 2','Headz Hit','Hat Snare','Uppercut']},
-  {group:'fx',     label:'FX',           hex:'#FF3DCB', led:57, names:['Riser','Rev Cymbal','Impact','Explosion','Rewind','Scratch','Hey','Air Horn']},
+  {group:'percs',  label:'Percussion',   hex:'#2F5BFF', led:45, light:true, names:['Rim','Clave','Cowbell','Maracas','Low Conga','Mid Conga','Low Tom','Mid Tom']},
+  {group:'dark',   label:'Underground',  hex:'#B04DFF', led:49, light:true, names:['Dist 808 Hit','Phonk Bell 1','Phonk Bell 2','Dirty Kick','Dist Boom 2','Headz Hit','Hat Snare','Uppercut']},
+  {group:'fx',     label:'FX',           hex:'#FF3DCB', led:57, light:true, names:['Riser','Rev Cymbal','Impact','Explosion','Rewind','Scratch','Hey','Air Horn']},
 ];
+// Page 4: a real acoustic drum kit, one kit piece per row (bottom to top).
+const ACOUSTIC_ROWS = [
+  {group:'ac-kicks',  label:'Kick drums',         hex:'#FF1F3D', led:5,  names:['Acoustic Kick','Studio Kick','Room Kick','Tight Kick','Swedish Kick','Soft Kick','Full Kick','Punch Kick']},
+  {group:'ac-snares', label:'Snares',             hex:'#FF8A00', led:9,  names:['Ludwig Snare','Ghost Note','Studio Snare 1','Studio Snare 2','Acoustic Snare','Fat Snare','Rock Snare','Wood Snare']},
+  {group:'ac-sticks', label:'Rimshots + sticks',  hex:'#FFE600', led:13, names:['Open Rimshot','Closed Rimshot','Rimshot','Side Stick','Cross Stick 1','Cross Stick 2','Soul Snare','Tight Snare']},
+  {group:'ac-toms',   label:'Toms (high to low)', hex:'#B04DFF', led:49, light:true, names:['Oak High','Oak Mid','Oak Low','Maple High','Maple Mid','Maple Low','Beech High','Beech Low']},
+  {group:'ac-closed', label:'Closed hi-hats',     hex:'#2BFF5A', led:21, chokes:{row:6, cols:[1,2,3,4,5,6,7,8]}, names:['Closed Hat','Pedal Chick','Loose Hat','Edge Hat','Tip Hat','Foot Close','Hat Hit','Bright Hat']},
+  {group:'ac-open',   label:'Open hi-hats',       hex:'#00E5FF', led:37, names:['Open Hat','Foot Splash','Open Edge','Full Open','Semi Open','Paiste Open','Paiste Open 2','Wide Open']},
+  {group:'ac-crash',  label:'Crashes + china',    hex:'#2F5BFF', led:45, light:true, names:['Paiste Crash','Left Crash','Right Crash','High Crash','Small Crash','China','Sabian China','Splash']},
+  {group:'ac-ride',   label:'Ride + percussion',  hex:'#FF3DCB', led:57, light:true, names:['Sizzle Ride','K Ride','Ride Bell','Ride Tip','Tambourine','Tambourine 2','Cowbell','Splash 2']},
+];
+const KITS = {drums: DRUM_ROWS, acoustic: ACOUSTIC_ROWS};
+const isKit = pid => pid in KITS;
 
 const ROLLS = [
   {name:'Roll off', beats:0}, {name:'1/8', beats:1/2}, {name:'1/8 T', beats:1/3},
@@ -420,6 +433,7 @@ const PAGES = [
   {id:'drums',  name:'Drums',  hex:'#FFC857', led:13},
   {id:'bass',   name:'808s',   hex:'#FF3D5A', led:5},
   {id:'melody', name:'Melody', hex:'#5CE1FF', led:37},
+  {id:'acoustic', name:'Acoustic', hex:'#FF8A3D', led:9},
 ];
 const MINOR = [0,2,3,5,7,8,10];
 const KEYS = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
@@ -444,8 +458,8 @@ function scaleMidi(row, col, pid) {
 }
 function padInfo(row, col) {
   const pid = PAGES[page].id;
-  if (pid === 'drums') {
-    const R = DRUM_ROWS[row-1], name = R.names[col-1];
+  if (isKit(pid)) {
+    const R = KITS[pid][row-1], name = R.names[col-1];
     return {kind:'drum', name, file:R.group + '/' + slug(name), hex:R.hex, led:R.led};
   }
   const {midi, isRoot} = scaleMidi(row, col, pid);
@@ -456,9 +470,9 @@ function padInfo(row, col) {
 }
 function slotItems() {
   const pid = PAGES[page].id;
-  return pid === 'drums' ? ROLLS : pid === 'bass' ? BASSES : INSTRUMENTS;
+  return isKit(pid) ? ROLLS : pid === 'bass' ? BASSES : INSTRUMENTS;
 }
-function slotSelected() { const pid = PAGES[page].id; return pid === 'drums' ? rollIdx : pid === 'bass' ? bassIdx : instIdx; }
+function slotSelected() { const pid = PAGES[page].id; return isKit(pid) ? rollIdx : pid === 'bass' ? bassIdx : instIdx; }
 
 // =====================================================================
 // Audio engine
@@ -477,7 +491,7 @@ function initAudio() {
 }
 
 // ---- sample loading: the bundles are <script> files so the page also works when opened straight from disk
-const BUNDLES = ['drums', 'bass', 'melody'];
+const BUNDLES = ['drums', 'bass', 'melody', 'acoustic'];
 const bundlesLoaded = Promise.all(BUNDLES.map(name => new Promise(res => {
   const s = document.createElement('script');
   s.src = 'sounds/' + name + '.js';
@@ -546,14 +560,13 @@ function track(v) { if (v) { active.add(v); v.src.addEventListener('ended', () =
 
 // ---- drums: one-shots. Different pads layer; hitting the same pad again restarts it,
 // and a closed hat cuts off a ringing open hat, so fast playing stays clean.
-const CHOKES_OPEN = new Set([0,1,2,3,4,5]);      // open hats only, not the crash and reverse crash
-const drumVoices = new Map();    // pad key -> last hit on that pad
-function playDrum(row, col, t, vel = 1) {
-  const info = DRUM_ROWS[row-1], key = row*10 + col;
+const drumVoices = new Map();    // "kit:pad" -> last hit on that pad
+function playDrum(row, col, t, vel = 1, kit = 'drums') {
+  const info = KITS[kit][row-1], key = kit + ':' + (row*10 + col);
   const file = info.group + '/' + slug(info.names[col-1]);
   const prev = drumVoices.get(key); if (prev) prev.stop(t, 0.01);
-  if (info.group === 'hats')
-    CHOKES_OPEN.forEach(i => { const v = drumVoices.get(51 + i); if (v) v.stop(t, 0.03); });
+  if (info.chokes)                 // a closed hi-hat cuts off the ringing open hats in its kit
+    info.chokes.cols.forEach(c => { const v = drumVoices.get(kit + ':' + (info.chokes.row*10 + c)); if (v) v.stop(t, 0.03); });
   const v = track(playSample(file, t, {gain: vel}));
   if (v) drumVoices.set(key, v);
 }
@@ -565,8 +578,8 @@ setInterval(() => {
   if (!ctx || !rolling.size) return;
   const horizon = ctx.currentTime + 0.1;
   rolling.forEach(r => { while (r.next < horizon) {
-    playDrum(r.row, r.col, r.next, 0.9);
-    recDrum(r.row, r.col, 0.9, r.next, ROLLS[rollIdx].beats);     // roll hits snap to the roll's own grid
+    playDrum(r.row, r.col, r.next, 0.9, r.kit);
+    recDrum(r.row, r.col, 0.9, r.next, ROLLS[rollIdx].beats, r.kit);     // roll hits snap to the roll's own grid
     r.next += rollStep();
   } });
 }, 25);
@@ -703,10 +716,10 @@ function recPos(i, t) {                             // position in the loop for 
   if (s.state === 'armed') { if (rel >= -SNAP && rel < 0) rel = 0; else return null; }   // a hair early still counts
   return rel >= 0 && rel < s.len ? rel : null;
 }
-function recDrum(row, col, vel, t, grid = SNAP) {
+function recDrum(row, col, vel, t, grid = SNAP, kit = 'drums') {
   const i = recSlot(); if (i < 0 || !transport.running) return;
   const rel = recPos(i, t); if (rel == null) return;
-  slots[i].events.push({type: 'drum', row, col, vel, p: wrapP(quant(rel, grid), slots[i].len)});
+  slots[i].events.push({type: 'drum', kit, row, col, vel, p: wrapP(quant(rel, grid), slots[i].len)});
 }
 function recNoteOn(key, kind, sound, midi, vel) {
   const i = recSlot(); if (i < 0 || !transport.running) return;
@@ -757,7 +770,7 @@ setInterval(() => {
   due.sort((a, b) => a.B - b.B || (a.e.type === 'off' ? -1 : 1));
   due.forEach(({B, i, e}) => {
     const t = Math.max(timeAt(B), ctx.currentTime);
-    if (e.type === 'drum') playDrum(e.row, e.col, t, e.vel);
+    if (e.type === 'drum') playDrum(e.row, e.col, t, e.vel, e.kit);
     else if (e.type === 'on') { const n = makeNote(e.kind, e.sound, e.midi, t, e.vel); if (n) loopVoices.set(i + ':' + e.id, n); }
     else { const n = loopVoices.get(i + ':' + e.id); if (n) { n.voice.stop(t, n.release); loopVoices.delete(i + ':' + e.id); } }
   });
@@ -784,9 +797,10 @@ function press(row, col, vel = 1) {
   pressedOn.set(key, page);
   flash(key, true);
   if (info.kind === 'drum') {
-    playDrum(row, col, ctx.currentTime, vel);
-    recDrum(row, col, vel, ctx.currentTime);
-    if (ROLLS[rollIdx].beats) rolling.set(key, {row, col, next: ctx.currentTime + rollStep()});
+    const kit = PAGES[page].id;
+    playDrum(row, col, ctx.currentTime, vel, kit);
+    recDrum(row, col, vel, ctx.currentTime, SNAP, kit);
+    if (ROLLS[rollIdx].beats) rolling.set(key, {row, col, kit, next: ctx.currentTime + rollStep()});
   } else if (info.kind === 'bass') { bassPress(key, info.midi, vel); recNoteOn(key, 'bass', bassIdx, info.midi, vel); }
   else { instPress(key, info.midi, vel); recNoteOn(key, 'inst', instIdx, info.midi, vel); }
 }
@@ -795,14 +809,14 @@ function release(row, col) {
   if (!pressedOn.has(key)) return;
   const was = PAGES[pressedOn.get(key)].id; pressedOn.delete(key);
   flash(key, false);
-  if (was === 'drums') rolling.delete(key);
+  if (isKit(was)) rolling.delete(key);
   else { if (was === 'bass') bassRelease(key); else instRelease(key); recNoteOff(key); }
 }
 
 function selectSlot(i) {
   const pid = PAGES[page].id, items = slotItems();
   if (i < 0 || i >= items.length) return;
-  if (pid === 'drums') {
+  if (isKit(pid)) {
     rollIdx = i;
     rolling.forEach(r => r.next = ctx ? ctx.currentTime : 0);        // new speed applies straight away
     if (!ROLLS[i].beats) rolling.clear();
@@ -832,7 +846,7 @@ function setPage(p) {
 }
 function changeKey(d) { keyRoot = (keyRoot + d + 12) % 12; renderPads(); refreshUI(); paintLaunchpad(); }
 function changeOctave(d) {
-  const pid = PAGES[page].id; if (pid === 'drums') return;
+  const pid = PAGES[page].id; if (isKit(pid)) return;
   octave[pid] = Math.max(-2, Math.min(2, octave[pid] + d));
   renderPads(); refreshUI(); paintLaunchpad();
 }
@@ -870,8 +884,9 @@ function renderPads(boot) {
     el.textContent = info.name;
     el.style.setProperty('--c', info.hex);
     el.dataset.root = info.isRoot ? '1' : '';
-    el.dataset.dim = (info.kind === 'drum' && ['percs','dark','fx'].includes(DRUM_ROWS[row-1].group)) || (info.kind === 'bass' && !info.isRoot) ? '1' : '';
-    el.title = info.kind === 'drum' ? `${DRUM_ROWS[row-1].label}: ${info.name}` : info.name;
+    const R = info.kind === 'drum' ? KITS[PAGES[page].id][row-1] : null;
+    el.dataset.dim = (R && R.light) || (info.kind === 'bass' && !info.isRoot) ? '1' : '';
+    el.title = R ? `${R.label}: ${info.name}` : info.name;
   }
   if (boot) { gridEl.classList.remove('boot'); void gridEl.offsetWidth; gridEl.classList.add('boot'); }
 }
@@ -962,15 +977,15 @@ function refreshUI() {
   const pid = PAGES[page].id, items = slotItems(), sel = slotSelected();
   [...tabsEl.children].forEach((b, i) => b.classList.toggle('on', i === page));
   document.getElementById('pageTag').textContent = `Page ${page+1} / ${PAGES.length} · ${PAGES[page].name}`;
-  document.getElementById('soundTitle').textContent = pid === 'drums' ? 'Hi-hat roll (hold a drum pad)' : pid === 'bass' ? '808' : 'Instrument';
+  document.getElementById('soundTitle').textContent = isKit(pid) ? 'Hi-hat roll (hold a drum pad)' : pid === 'bass' ? '808' : 'Instrument';
   [...soundBtns.children].forEach((b, i) => { b.textContent = items[i].name; b.classList.toggle('on', i === sel); });
   document.getElementById('keyLabel').textContent = KEYS[keyRoot] + ' min';
   document.getElementById('bpmLabel').textContent = bpm;
-  const oct = pid === 'drums' ? 0 : octave[pid];
-  document.getElementById('octSection').style.opacity = pid === 'drums' ? .35 : 1;
-  document.getElementById('octUp').disabled = document.getElementById('octDown').disabled = pid === 'drums';
-  document.getElementById('octLabel').textContent = pid === 'drums' ? '—' : (oct > 0 ? '+' : '') + oct;
-  [...document.getElementById('gauge').children].forEach((t, i) => t.classList.toggle('on', pid !== 'drums' && i === oct + 2));
+  const kitPage = isKit(pid), oct = kitPage ? 0 : octave[pid];
+  document.getElementById('octSection').style.opacity = kitPage ? .35 : 1;
+  document.getElementById('octUp').disabled = document.getElementById('octDown').disabled = kitPage;
+  document.getElementById('octLabel').textContent = kitPage ? '—' : (oct > 0 ? '+' : '') + oct;
+  [...document.getElementById('gauge').children].forEach((t, i) => t.classList.toggle('on', !kitPage && i === oct + 2));
 
   // round buttons on screen
   [...sideEl.children].forEach(b => {
@@ -984,7 +999,7 @@ function refreshUI() {
   // legend
   const lg = document.getElementById('legend');
   let html = '';
-  if (pid === 'drums') html = [...DRUM_ROWS].reverse().map((r, i) => `<span class="key" style="--k:${r.hex}">Row ${8-i}: ${r.label}</span>`).join('');
+  if (isKit(pid)) html = [...KITS[pid]].reverse().map((r, i) => `<span class="key" style="--k:${r.hex}">Row ${8-i}: ${r.label}</span>`).join('');
   else if (pid === 'bass') html = `<span class="key" style="--k:#FF1F3D">${KEYS[keyRoot]} (root note)</span><span class="key" style="--k:#B04DFF">Other notes in ${KEYS[keyRoot]} minor</span>`;
   else html = `<span class="key" style="--k:#2F5BFF">${KEYS[keyRoot]} (root note)</span><span class="key" style="--k:#00E5FF">Other notes in ${KEYS[keyRoot]} minor</span>`;
   lg.innerHTML = html + `<label class="toggle"><input type="checkbox" id="labels" ${document.body.classList.contains('no-labels') ? '' : 'checked'}> Show names on pads</label>`;
