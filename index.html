@@ -137,6 +137,12 @@
     background:linear-gradient(160deg, #2a2b2f, #17181b); color:transparent;
     box-shadow:inset 0 1px 1px rgba(255,255,255,.12), inset 0 -2px 3px rgba(0,0,0,.6), 0 0 0 1px #000;
   }
+  /* Practice, "Only white lights": every pad is dark except the next note (white), pads you press and red mistakes */
+  body.only-white .pad:not(.hint):not(.hit):not(.wrong) {
+    background:linear-gradient(160deg, #2a2b2f, #17181b) !important; color:rgba(255,255,255,.3); text-shadow:none;
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.12), inset 0 -2px 3px rgba(0,0,0,.6), 0 0 0 1px #000 !important;
+  }
+  body.only-white .pad:not(.hint):not(.hit):not(.wrong)::before { border-color:rgba(255,255,255,.14); }
   body.live #grid.boot .pad { animation:boot .55s calc(var(--r) * 50ms) both; }
   @keyframes boot {
     0%   { filter:brightness(.15) saturate(0); }
@@ -260,6 +266,14 @@
   .timeline { width:100%; margin:0; }
   .tl-head { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin-bottom:6px; }
   .tl-head h2 { margin:0 6px 0 0; font-size:13px; font-weight:500; color:var(--dim); }
+  .mode-seg { display:flex; margin-right:6px; }
+  .tl-head .mode-seg button { border-radius:0; font-weight:600; }
+  .tl-head .mode-seg button + button { border-left:0; }
+  .tl-head .mode-seg button:first-child { border-radius:2px 0 0 2px; }
+  .tl-head .mode-seg button:last-child { border-radius:0 2px 2px 0; }
+  .practice-only { display:contents; }
+  .practice-only[hidden] { display:none; }
+  body:not(.practice) .practice-only, body:not(.practice) #tlScrollRow, body:not(.practice) #songClose { display:none !important; }
   .tl-head button, .tl-head select, .tl-head input[type=search] {
     font-family:var(--ui); font-size:13px; color:var(--text); background:rgba(92,225,255,.04);
     border:1px solid var(--line-hi); border-radius:2px; padding:5px 9px; cursor:pointer;
@@ -285,9 +299,24 @@
   .tl-zoom button { padding:4px 9px; }
   .tl-info { font-size:12px; color:var(--dim); margin-bottom:6px; min-height:1.2em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   #tl { display:block; width:100%; height:clamp(150px, 24vh, 320px); background:#081018; border:1px solid var(--line); border-radius:6px; cursor:pointer; }
+  .tl-scroll { display:flex; align-items:center; gap:10px; margin-top:8px; font-family:var(--mono); font-size:12px; color:var(--dim); }
+  .tl-scroll[hidden] { display:none; }
+  .tl-scroll input { flex:1; --fill:0%; }
+  .tl-scroll input::-webkit-slider-runnable-track { background:linear-gradient(90deg, var(--page) var(--fill), var(--line-hi) var(--fill)); }
+  .tl-scroll input::-webkit-slider-thumb { box-shadow:0 0 10px var(--page); }
+  #tlBarLabel { color:var(--text); min-width:52px; }
   .timeline.drop #tl { outline:2px dashed var(--page); outline-offset:3px; }
-  .pad.hint { outline:3px solid #fff; outline-offset:1px; animation:hint .6s ease-in-out infinite alternate; }
-  @keyframes hint { from { box-shadow:0 0 6px #fff, 0 0 14px var(--c); } to { box-shadow:0 0 18px #fff, 0 0 36px var(--c); } }
+  /* the next note to play: solid white, like the Launchpad shows it */
+  .pad.hint, body.live .pad.hint {
+    background:#fff; color:rgba(0,0,0,.8); text-shadow:none;
+    box-shadow:inset 0 1px 1px #fff, 0 0 0 1px rgba(0,0,0,.6), 0 0 18px #fff, 0 0 34px rgba(255,255,255,.5);
+  }
+  .pad.hint::before { border-color:rgba(0,0,0,.35); }
+  /* a wrong note in Practice: the pad and the ones around it blink red twice */
+  .pad.wrong, body.live .pad.wrong {
+    background:#ff1f3d; color:#fff; text-shadow:none;
+    box-shadow:inset 0 1px 1px #ff8a9a, 0 0 0 1px rgba(0,0,0,.6), 0 0 20px #ff1f3d, 0 0 34px rgba(255,31,61,.5);
+  }
 
   #pasteDlg { background:#0b1a25; color:var(--text); border:1px solid var(--line-hi); padding:20px; width:min(520px, 92vw); font-family:var(--ui); }
   #pasteDlg::backdrop { background:rgba(0,0,0,.6); }
@@ -351,7 +380,11 @@
 
     <section class="timeline" id="timelineSec">
       <div class="tl-head">
-        <h2>Timeline</h2>
+        <div class="mode-seg" id="modeSeg" role="group" aria-label="Mode">
+          <button data-mode="free" class="on" title="Just the pads: no song, no hints">Free play</button>
+          <button data-mode="practice" title="Load a song and the pads walk you through it, note by note">Practice</button>
+        </div>
+        <span class="practice-only">
         <div class="tl-search">
           <input id="songSearch" type="search" placeholder="Search your songs…" autocomplete="off" aria-label="Search your songs">
           <div id="songResults" class="tl-results" hidden></div>
@@ -363,12 +396,22 @@
         <button id="songPlay" disabled>▶ Play</button>
         <button id="songRewind" disabled title="Back to the start">⟲</button>
         <label class="toggle"><input type="checkbox" id="hearToggle" checked> Hear melody</label>
-        <label class="toggle" title="Light up the pads for the next notes of the song"><input type="checkbox" id="followToggle" checked> Show next notes</label>
+        <label class="toggle" title="Turn every pad light off except the white next-note pads (and the ones you press)"><input type="checkbox" id="whiteOnly"> Only white lights</label>
+        <select id="loopSel" aria-label="Practice loop" title="The section you practise. A wrong note sends you back to its start; play it clean and you move on to the next one">
+          <option value="0">Loop: whole song</option><option value="8">Loop: 8 bars</option>
+          <option value="4" selected>Loop: 4 bars</option><option value="2">Loop: 2 bars</option><option value="1">Loop: 1 bar</option>
+        </select>
+        </span>
         <div class="tl-zoom"><button id="zoomOut" aria-label="Show more bars">−</button><span id="zoomLabel">8 bars</span><button id="zoomIn" aria-label="Show fewer bars">+</button></div>
         <button id="songClose" hidden>Close song</button>
       </div>
-      <div class="tl-info" id="tlInfo">Play some pads: your notes show up here as you play. Search your songs, load a MIDI file, or drop one onto the timeline.</div>
+      <div class="tl-info" id="tlInfo">Free play: just play. Your notes show up here as you play. Switch to Practice to learn a song.</div>
       <canvas id="tl"></canvas>
+      <div class="tl-scroll" id="tlScrollRow" hidden>
+        <span id="tlBarLabel">Bar 1</span>
+        <input type="range" id="tlScroll" min="0" max="4" step="0.25" value="0" aria-label="Move through the song">
+        <span id="tlLenLabel">/ 1</span>
+      </div>
     </section>
     </div>
 
@@ -935,6 +978,7 @@ function press(row, col, vel = 1) {
     if (ROLLS[rollIdx].beats) rolling.set(key, {row, col, kit, next: ctx.currentTime + rollStep()});
   } else if (info.kind === 'bass') { bassPress(key, info.midi, vel); recNoteOn(key, 'bass', bassIdx, info.midi, vel); tlNoteOn(key, info.midi); }
   else { instPress(key, info.midi, vel); recNoteOn(key, 'inst', instIdx, info.midi, vel); tlNoteOn(key, info.midi); }
+  if (info.kind !== 'drum') tlStepPress(info.midi, key);
 }
 function release(row, col) {
   const key = row*10 + col;
@@ -1191,7 +1235,7 @@ function shortName(n) { return n.replace(' 808', '').replace('Distorted', 'Dist'
 
 function flash(key, on) {
   const el = padEls[key]; if (el) el.classList.toggle('hit', on);
-  sendLED(key, on ? LED.white : padInfo(Math.floor(key/10), key%10).led, !on && hinted.has(key) ? LED.white : 0);
+  if (!wrongKeys.has(key)) sendLED(key, on || hinted.has(key) ? LED.white : baseLED(key));
 }
 
 // =====================================================================
@@ -1261,7 +1305,7 @@ function sendCC(cc, color, flash = false) {
 function paintLaunchpad() {
   if (!lpOut || rainbowTimer) return;
   for (let r=1;r<=8;r++) {
-    for (let c=1;c<=8;c++) sendLED(r*10+c, pressedOn.has(r*10+c) ? LED.white : padInfo(r,c).led, hinted.has(r*10+c) && !pressedOn.has(r*10+c) ? LED.white : 0);
+    for (let c=1;c<=8;c++) if (!wrongKeys.has(r*10+c)) sendLED(r*10+c, padLED(r*10+c));
     sendLED(r*10+9, sideLED(r*10+9));
   }
   slots.forEach((_, i) => { const L = slotLight(i); sendCC(104 + i, L.led, L.flash); });
@@ -1373,7 +1417,7 @@ document.getElementById('start').onclick = async () => {
 const TL = {
   song: null,                 // {id, name, bpm, tracks, melodyTrack, notes, chords, len}
   playing: false, startTime: 0, startBeat: 0, pos: 0, schedUntil: 0,
-  hear: true, follow: true, bars: 8,
+  hear: true, bars: 8,
   live: [], hits: [], held: new Map(), voices: [],
 };
 const tlCanvas = document.getElementById('tl'), tlInfo = document.getElementById('tlInfo');
@@ -1407,7 +1451,7 @@ function songStop() {
   tlButtons();
 }
 function songSeek(b) {
-  const was = TL.playing; songStop(); TL.pos = Math.max(0, Math.min(b, TL.song ? TL.song.len : 0)); if (was) songPlay();
+  const was = TL.playing; songStop(); TL.pos = Math.max(0, Math.min(b, TL.song ? TL.song.len : 0)); TL.stepDone?.clear(); if (was) songPlay();
 }
 setInterval(() => {                                   // song playback scheduler (melody only)
   if (!TL.playing || !ctx) return;
@@ -1558,6 +1602,7 @@ function romanOf(c) {
 // ---- loading songs
 function setSong(data, name, id, melodyTrack) {
   songStop();
+  mode = 'practice'; parkedSong = null; applyMode();
   const tracks = data.tracks.map(t => ({name: t.name, drums: !!t.drums, notes: t.notes.map(n => Array.isArray(n) ? {b: n[0], d: n[1], m: n[2], v: n[3] ?? 0.8} : n)}));
   const mi = melodyTrack != null && tracks[melodyTrack] && !tracks[melodyTrack].drums ? melodyTrack : guessMelodyTrack(tracks);
   const notes = tracks[mi].notes;
@@ -1580,7 +1625,7 @@ function setSong(data, name, id, melodyTrack) {
   if (newBpm !== bpm) changeBpm(newBpm - bpm);
   renderPads(); refreshUI(); paintLaunchpad();
   const missing = notes.length - bestReach;
-  tlInfo.textContent = `${name} · ${KEYS[keyRoot]} minor${scaleIdx ? ' (' + SCALES[scaleIdx].name.toLowerCase() + ')' : ''} · ${bpm} BPM · ${notes.length} melody notes` +
+  TL.song.info = tlInfo.textContent = `${name} · ${KEYS[keyRoot]} minor${scaleIdx ? ' (' + SCALES[scaleIdx].name.toLowerCase() + ')' : ''} · ${bpm} BPM · ${notes.length} melody notes` +
     (missing ? ` · ${missing} are outside the pad grid at this octave` : ' · every note is on the Melody page');
   updateTrackSel(); tlButtons();
 }
@@ -1740,9 +1785,10 @@ document.getElementById('trackSel').onchange = e => {
 };
 document.getElementById('songPlay').onclick = () => TL.playing ? songStop() : songPlay();
 document.getElementById('songRewind').onclick = () => songSeek(0);
-document.getElementById('songClose').onclick = () => { songStop(); TL.song = null; tlInfo.textContent = 'Play some pads: your notes show up here as you play.'; updateTrackSel(); tlButtons(); };
+document.getElementById('songClose').onclick = () => { setMode('free'); parkedSong = null; };
 document.getElementById('hearToggle').onchange = e => { TL.hear = e.target.checked; if (!TL.hear) { TL.voices.forEach(v => v.n.voice.stop(ctx.currentTime, 0.05)); TL.voices = []; } };
-document.getElementById('followToggle').onchange = e => { TL.follow = e.target.checked; };
+document.getElementById('loopSel').onchange = e => { TL.loopBars = +e.target.value; TL.stepDone.clear(); e.target.blur(); };
+document.getElementById('modeSeg').onclick = e => { const b = e.target.closest('[data-mode]'); if (b) { setMode(b.dataset.mode); b.blur(); } };
 document.getElementById('zoomIn').onclick = () => { TL.bars = Math.max(2, TL.bars / 2); tlButtons(); };
 document.getElementById('zoomOut').onclick = () => { TL.bars = Math.min(32, TL.bars * 2); tlButtons(); };
 const tlSec = document.getElementById('timelineSec');
@@ -1757,6 +1803,29 @@ tlCanvas.addEventListener('pointerdown', e => {
   songSeek(tlView.left + (x - tlView.gutter) / tlView.ppb);
 });
 
+// ---- scroll slider under the timeline (and the mouse wheel over it) move through the song
+const tlScroll = document.getElementById('tlScroll');
+let tlDragging = false, tlResume = false;
+tlScroll.addEventListener('pointerdown', () => { tlDragging = true; tlResume = TL.playing; if (TL.playing) songStop(); });
+tlScroll.addEventListener('input', () => { if (!TL.song) return; if (TL.playing) songStop(); TL.pos = +tlScroll.value; TL.stepDone.clear(); });
+const endDrag = () => { if (!tlDragging) return; tlDragging = false; if (tlResume) songPlay(); };
+tlScroll.addEventListener('pointerup', endDrag); tlScroll.addEventListener('change', endDrag);
+tlCanvas.addEventListener('wheel', e => {
+  if (!TL.song) return;
+  e.preventDefault();
+  const step = (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) / 100;   // one wheel notch ≈ one beat
+  songSeek(songBeatAt(ctx ? ctx.currentTime : 0) + step);
+}, {passive: false});
+function updateScroll(pos) {
+  const row = document.getElementById('tlScrollRow');
+  row.hidden = !TL.song; if (!TL.song) return;
+  if (+tlScroll.max !== TL.song.len) tlScroll.max = TL.song.len;
+  if (!tlDragging) tlScroll.value = pos;
+  tlScroll.style.setProperty('--fill', (Math.min(1, pos / TL.song.len) * 100) + '%');
+  document.getElementById('tlBarLabel').textContent = 'Bar ' + (Math.floor(pos / 4) + 1);
+  document.getElementById('tlLenLabel').textContent = '/ ' + TL.song.len / 4;
+}
+
 // ---- pads that play a given note on the current page, for "light up next notes"
 function padsForMidi() {
   const pid = PAGES[page].id, map = new Map();
@@ -1766,19 +1835,131 @@ function padsForMidi() {
   }
   return map;
 }
+// ---- Free play and Practice
+// Free play: just the pads, no song and no hints. Practice: a song, and the pads walk you through it:
+// the pad for the next note turns solid white and waits until you play it. A wrong note blinks the pads
+// around it red and sends you back to the start of the loop section; play the section clean to move on.
+let mode = 'free', parkedSong = null;
+TL.loopBars = 4; TL.stepDone = new Set();
+const FREE_INFO = 'Free play: just play. Your notes show up here as you play. Switch to Practice to learn a song.';
+function applyMode() {
+  document.body.classList.toggle('practice', mode === 'practice');
+  [...document.getElementById('modeSeg').children].forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
+}
+function setMode(m) {
+  if (m === mode) return;
+  if (m === 'free') {
+    songStop(); parkedSong = TL.song; TL.song = null; TL.stepDone.clear();
+    mode = 'free'; applyMode(); tlInfo.textContent = FREE_INFO;
+  } else if (parkedSong) {                              // back to the song you had, where you left it
+    TL.song = parkedSong; parkedSong = null; TL.stepDone.clear();
+    mode = 'practice'; applyMode(); tlInfo.textContent = TL.song.info || TL.song.name;
+  } else openSong(libLoad()[0]?.id || 'demo');          // nothing loaded yet: your latest song, or the demo
+  updateTrackSel(); tlButtons(); renderPads(); paintLaunchpad();
+}
 let hinted = new Set();
+function stepNotes() {                                // the notes that start together at the current step
+  const s = TL.song; if (!s) return [];
+  const first = s.notes.find(n => n.b >= TL.pos - 1e-6); if (!first) return [];
+  return s.notes.filter(n => Math.abs(n.b - first.b) < 1e-6);
+}
+function loopRange(b) {                               // the practice section that beat b falls in
+  const len = TL.song.len; if (!TL.loopBars) return [0, len];
+  const L = TL.loopBars * 4, s = Math.floor(b / L + 1e-6) * L;
+  return [s, Math.min(s + L, len)];
+}
+const barName = (a, b) => b - a <= 4 ? `bar ${a / 4 + 1}` : `bars ${a / 4 + 1}–${Math.ceil(b / 4)}`;
+function tlStepPress(midi, key) {
+  if (!TL.song || mode !== 'practice' || TL.playing) return;
+  const step = stepNotes(); if (!step.length) return;
+  const [ls, le] = loopRange(step[0].b), name = TL.song.name;
+  if (!step.some(n => n.m === midi)) {                 // wrong note: blink red, back to the start of the section
+    wrongFlash(key); TL.stepDone.clear();
+    const first = TL.song.notes.find(n => n.b >= ls - 1e-6);
+    TL.pos = first ? first.b : ls;
+    tlInfo.textContent = `${name} · wrong note, back to the start of ${TL.loopBars ? barName(ls, le) : 'the song'}.`;
+    return;
+  }
+  TL.stepDone.add(midi);
+  if (!step.every(n => TL.stepDone.has(n.m))) return;  // a chord: wait for all its notes
+  TL.stepDone.clear();
+  const next = TL.song.notes.find(n => n.b > step[0].b + 1e-6);
+  if (!next) { TL.pos = 0; tlInfo.textContent = `${name} · you played it all the way through! Starting again from the top.`; }
+  else {
+    TL.pos = next.b;
+    if (TL.loopBars && next.b >= le - 1e-6) tlInfo.textContent = `${name} · ${barName(ls, le)} clean! On to bar ${Math.floor(next.b / 4) + 1}.`;
+  }
+}
+// wrong note: the pad and the (up to 8) pads around it blink red twice, on screen and on the Launchpad
+const wrongKeys = new Set(); let wrongGen = 0;
+const padLED = k => pressedOn.has(k) || hinted.has(k) ? LED.white : baseLED(k);
+// "Only white lights" (Practice, note pages): every other pad light is off
+let onlyWhite = localStorage.getItem('bassment.onlyWhite') === '1', darkNow = false;
+const darkPads = () => onlyWhite && mode === 'practice' && !!TL.song && !isKit(PAGES[page].id);
+function baseLED(k) { return darkNow ? LED.off : padInfo(Math.floor(k / 10), k % 10).led; }
+function syncDark() {                                 // called every frame; repaints only when it changes
+  const d = darkPads(); if (d === darkNow) return;
+  darkNow = d; document.body.classList.toggle('only-white', d); paintLaunchpad();
+}
+document.getElementById('whiteOnly').checked = onlyWhite;
+document.getElementById('whiteOnly').onchange = e => { onlyWhite = e.target.checked; localStorage.setItem('bassment.onlyWhite', onlyWhite ? '1' : '0'); syncDark(); };
+function wrongFlash(key) {
+  const r = Math.floor(key / 10), c = key % 10, keys = [], gen = ++wrongGen;
+  for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+    const rr = r + dr, cc = c + dc; if (rr >= 1 && rr <= 8 && cc >= 1 && cc <= 8) keys.push(rr * 10 + cc);
+  }
+  wrongKeys.forEach(k => { const el = padEls[k]; if (el) el.classList.remove('wrong'); if (!keys.includes(k)) sendLED(k, padLED(k)); });
+  wrongKeys.clear();
+  keys.forEach(k => wrongKeys.add(k));
+  const send = red => { if (gen === wrongGen && !rainbowTimer) keys.forEach(k => { const el = padEls[k]; if (el) el.classList.toggle('wrong', red); sendLED(k, red ? LED.red : padLED(k)); }); };
+  send(true);
+  setTimeout(() => send(false), 140);
+  setTimeout(() => send(true), 260);
+  setTimeout(() => {
+    if (gen !== wrongGen) return;
+    keys.forEach(k => { wrongKeys.delete(k); const el = padEls[k]; if (el) el.classList.remove('wrong'); });
+    send(false);
+  }, 520);
+}
+// A note can sit on two pads. Each note in the song gets ONE fixed pad for the whole song, so the same
+// note always lights the same pad. The pads are chosen to sit close together, around where the song's
+// notes cluster, so your hand stays in one area.
+let songPads = {sig: '', pick: new Map()};
+function songPadFor(map, midi) {
+  const s = TL.song, sig = s.id + '|' + s.melodyTrack + '|' + s.notes.length + '|' + [...map].map(([m, k]) => m + ':' + k.join(',')).join(';');
+  if (songPads.sig !== sig) {
+    const count = new Map(); s.notes.forEach(n => { if (map.has(n.m)) count.set(n.m, (count.get(n.m) || 0) + 1); });
+    const rc = k => [Math.floor(k / 10), k % 10];
+    // start from the middle of every candidate pad, then settle: pick the nearest pad per note, re-centre, repeat
+    let cr = 0, cc = 0, w = 0;
+    count.forEach((n, m) => map.get(m).forEach(k => { const [r, c] = rc(k); cr += r * n; cc += c * n; w += n; }));
+    cr /= w || 1; cc /= w || 1;
+    const pick = new Map();
+    for (let it = 0; it < 4; it++) {
+      count.forEach((n, m) => pick.set(m, map.get(m).reduce((a, k) => {
+        const d = k => { const [r, c] = rc(k); return Math.hypot(r - cr, c - cc) + c * 1e-3; };   // ties: leftmost
+        return d(k) < d(a) ? k : a; })));
+      cr = cc = w = 0;
+      pick.forEach((k, m) => { const n = count.get(m), [r, c] = rc(k); cr += r * n; cc += c * n; w += n; });
+      cr /= w || 1; cc /= w || 1;
+    }
+    songPads = {sig, pick};
+  }
+  return songPads.pick.get(midi) ?? map.get(midi)[0];
+}
 function updateHints(pos) {
   const want = new Set();
-  if (TL.song && TL.follow && !isKit(PAGES[page].id)) {
+  if (TL.song && mode === 'practice' && !isKit(PAGES[page].id)) {
     const map = padsForMidi();
-    TL.song.notes.forEach(n => { if (n.b <= pos + 0.75 && n.b + n.d > pos) (map.get(n.m) || []).forEach(k => want.add(k)); });
+    const notes = TL.playing ? TL.song.notes.filter(n => n.b <= pos && pos < n.b + n.d) : stepNotes();
+    notes.forEach(n => { const keys = map.get(n.m); if (keys) want.add(songPadFor(map, n.m)); });
   }
   if (want.size === hinted.size && [...want].every(k => hinted.has(k))) return;
   const changed = new Set([...want, ...hinted]);
   hinted = want;
   changed.forEach(k => {
     const el = padEls[k]; if (el) el.classList.toggle('hint', want.has(k));
-    if (!rainbowTimer && !pressedOn.has(k)) { const info = padInfo(Math.floor(k / 10), k % 10); sendLED(k, info.led, want.has(k) ? LED.white : 0); }
+    if (!rainbowTimer && !pressedOn.has(k) && !wrongKeys.has(k)) sendLED(k, want.has(k) ? LED.white : baseLED(k));
   });
 }
 
@@ -1797,7 +1978,9 @@ function drawTimeline() {
   const beatOf = songMode ? (TL.playing ? songBeatAt : null) : (t => transport.running ? beatAt(t) : t * bpm / 60);
   const pos = songMode ? songBeatAt(now) : beatOf(now);
   const left = songMode ? pos - span * 0.2 : pos - span * 0.85;
+  syncDark();
   updateHints(songMode ? pos : -1);
+  updateScroll(pos);
 
   // pitch range: the song's notes, or the pads of the current note page, plus anything played recently
   let lo, hi;
@@ -1835,6 +2018,18 @@ function drawTimeline() {
       g.fillStyle = lit ? '#fff' : '#9fb8c6'; g.fillText(KEYS[m % 12] + (deg === 1 ? Math.floor(m / 12) - 1 : ''), 24, y + laneH / 2);
     }
   });
+  // the practice loop section: edges in the page colour, everything outside it dimmed
+  if (songMode && TL.loopBars) {
+    const [ls, le] = loopRange(TL.playing ? pos : (stepNotes()[0]?.b ?? pos));
+    const x0 = Math.max(gutter, xOf(ls)), x1 = Math.min(W, xOf(le)), h = H - top - chordH - 4;
+    g.fillStyle = 'rgba(0,0,0,.4)';
+    if (x0 > gutter) g.fillRect(gutter, top, x0 - gutter, h);
+    if (x1 < W) g.fillRect(x1, top, W - x1, h);
+    g.fillStyle = getComputedStyle(document.body).getPropertyValue('--page').trim() || '#5ce1ff'; g.globalAlpha = 0.85;
+    if (xOf(ls) >= gutter) g.fillRect(xOf(ls) - 1, top, 2, h);
+    if (xOf(le) <= W) g.fillRect(xOf(le) - 1, top, 2, h);
+    g.globalAlpha = 1;
+  }
   // bar and beat lines
   for (let b = Math.ceil(left); b <= left + span; b++) {
     const x = xOf(b); const bar = ((b % 4) + 4) % 4 === 0;

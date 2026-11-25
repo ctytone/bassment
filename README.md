@@ -32,12 +32,17 @@ The 808 and Melody pages play in the key you pick, with three scales: **Minor**,
 
 ## Timeline
 
-A piano roll under the pads, in the same colours.
+A piano roll under the pads, in the same colours. It has two modes:
 
-- Notes you play (and loops playing back) appear on it as you play, and their lanes light up.
+- **Free play:** just the pads and the music. Notes you play (and loops playing back) appear on the timeline and their lanes light up; no song, no hints.
+- **Practice:** load a song and the pads walk you through it. The pad for the next note is solid white (each note always on the same pad) and waits until you play it. A wrong note blinks that pad and the ones around it red and sends you back to the start of the loop section (1, 2, 4 or 8 bars, or the whole song); play the section clean to move on. Switching back to Practice returns to the song where you left it.
+
+In Practice:
+
 - **Load a MIDI file** (or drop one on it) to see a song: Bassment picks the melody track, works out the key and chords (shown Hooktheory-style, e.g. `i`, `V`, `III`), and sets the key, scale and octave so the melody fits on the Melody page.
 - **Paste from Hooktheory:** on a TheoryTab click *Copy*, then paste into Bassment (the button, or just Ctrl+V on the page). The melody comes in with its key; it is saved in your browser only.
-- **Play** it back, turn **Hear melody** off to play it yourself, and **Light up next notes** to have the pads (and the Launchpad) show which note comes next. Click the timeline to jump.
+- **Only white lights** turns every other pad light off (on screen and on the Launchpad) so only the next note shows; the setting is remembered. Drum pages keep their lights.
+- **Play** it back (the white pad follows the melody), or turn **Hear melody** off. Click the timeline, drag the slider under it, or use the mouse wheel to move through the song.
 - Every song you load is saved in this browser; the search box finds it again. A short original demo is built in.
 
 ## Folders
