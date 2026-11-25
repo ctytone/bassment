@@ -26,6 +26,20 @@ The 8 round buttons on the top row are loop tracks.
 - Lights: flashing yellow = count-in, flashing red = recording, green = playing, dim yellow = muted.
 - Loops can mix any pages and keep playing while you switch. Loop length, snap to beat, the recording click, play/stop and clear all are in the panel.
 
+## Scales and colours
+
+The 808 and Melody pages play in the key you pick, with three scales: **Minor**, **Harmonic minor** (adds the raised 7th, e.g. A# in B minor) and **All notes** (every white and black key, each row 5 semitones up). Notes are coloured the way Hooktheory colours them; notes outside the key are striped and root notes have a white outline.
+
+## Timeline
+
+A piano roll under the pads, in the same colours.
+
+- Notes you play (and loops playing back) appear on it as you play, and their lanes light up.
+- **Load a MIDI file** (or drop one on it) to see a song: Bassment picks the melody track, works out the key and chords (shown Hooktheory-style, e.g. `i`, `V`, `III`), and sets the key, scale and octave so the melody fits on the Melody page.
+- **Paste from Hooktheory:** on a TheoryTab click *Copy*, then paste into Bassment (the button, or just Ctrl+V on the page). The melody comes in with its key; it is saved in your browser only.
+- **Play** it back, turn **Hear melody** off to play it yourself, and **Light up next notes** to have the pads (and the Launchpad) show which note comes next. Click the timeline to jump.
+- Every song you load is saved in this browser; the search box finds it again. A short original demo is built in.
+
 ## Folders
 
 | Path | What it is |
